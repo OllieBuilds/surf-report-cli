@@ -1,4 +1,4 @@
-use crate::config_file::UserConfig;
+use crate::{config_file::UserConfig, tides::TideStamp};
 use crate::tides::parse_tides;
 
 use serde::{Deserialize, Serialize};
@@ -39,7 +39,7 @@ fn format_login_request_body(user: &UserConfig) -> String {
 fn make_login_request(url: &str, user: &UserConfig) -> Result<reqwest::blocking::Response, reqwest::Error> {
     let client = reqwest::blocking::Client::new();
     let mut headers = get_login_headers();
-    headers.insert(header::AUTHORIZATION, user.auth.parse().unwrap());
+    headers.insert(header::AUTHORIZATION, user.auth_header.parse().unwrap());
 
 
     return client
@@ -57,7 +57,10 @@ pub fn get_session_token(user: &UserConfig) -> Result<SessionToken, String> {
     let url = "https://services.surfline.com/trusted/token?isShortLived=false";
     let response = match make_login_request(url, user) {
         Ok(res) => res,
-        Err(error) => return Err(error.to_string())
+        Err(error) => {
+            println!("ERR: {:?}", error);
+            return Err(error.to_string())
+        }
     };
 
     match response.status() {
@@ -105,8 +108,10 @@ pub fn get_tide_data(session_token: &SessionToken, spot_id: &String) {
             }
             parse_tides(&body.unwrap()) //.map_err(|err| err.to_string())
         },
-        // _ => Err(format!("Response code: {}", response.status()))
-        _ => println!("Response code: {}", response.status())
+        _ => {
+            println!("Response code: {}", response.status());
+            vec!()
+        }
     };
 }
 

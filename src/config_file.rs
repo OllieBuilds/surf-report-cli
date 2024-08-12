@@ -26,6 +26,7 @@ pub fn read_config_file(fp: &str) -> Option<UserConfig> {
     let config_lines = config_buff.lines();
     let mut user_email = String::new(); 
     let mut user_password = String::new();
+    let mut user_auth_header = String::new();
 
 
     for line in config_lines {
@@ -39,7 +40,7 @@ pub fn read_config_file(fp: &str) -> Option<UserConfig> {
                 user_password = split_parts[1].to_string();
             },
             "auth_header" => {
-                auth_header = split_parts[1].to_string();
+                user_auth_header = split_parts[1].to_string();
             },
             _ => (),
         }
@@ -52,14 +53,14 @@ pub fn read_config_file(fp: &str) -> Option<UserConfig> {
     if Some(&user_password)?.is_empty() {
         return None;
     }
-    if Some(&auth_header)?.is_empty() {
+    if Some(&user_auth_header)?.is_empty() {
         return None;
     }
 
     return Some(UserConfig{
         email: Some(user_email).unwrap(),
         password: Some(user_password).unwrap(),
-        auth_header: Some(auth_header).unwwrap()
+        auth_header: Some(user_auth_header).unwrap()
     });
 }
 
