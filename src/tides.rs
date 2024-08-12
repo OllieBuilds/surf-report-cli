@@ -10,6 +10,11 @@ pub struct TideStamp {
     height: f32
 }
 
+pub fn find_high_and_low_tides(tides: &mut Vec<TideStamp>) {
+    tides.sort_by(|a, b| a.height.total_cmp(&b.height));
+    println!("{:?}", tides);
+}
+
 pub fn parse_tides(response_body: &String) -> Vec<TideStamp>{
     // Parse the string of data into serde_json::Value.
     let tides_array: Value = serde_json::from_str(response_body).unwrap_or(Value::Null);
@@ -22,9 +27,7 @@ pub fn parse_tides(response_body: &String) -> Vec<TideStamp>{
         }
     };
 
+    find_high_and_low_tides(&mut tide_stamps);
     return tide_stamps;
 }
 
-pub fn find_high_and_low_tides(tides: Vec<TideStamp>) {
-    
-}
